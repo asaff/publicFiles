@@ -1,0 +1,671 @@
+swagger: "2.0"
+info:
+  title: Kochav gate way
+  description: gate way to kochav
+  version: 1.0.0
+schemes:
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+  - text/xml
+paths:
+  /kochav/api/v1/coinsAccumulation:
+    x-swagger-pipe: swagger_controllers_pipe
+    x-swagger-router-controller: kochav-gw
+    get:
+      operationId: coinsAccumulation
+      description: gets the customers credit coins history and all credit card billing by a specified month
+      parameters:
+        - name: personalIdNumber
+          in: query
+          description: customers id or passport id (9 digits)
+          required: true
+          type: string
+          minLength: 9
+          maxLength: 9
+          pattern: '^\d+$'
+        - name: personalIdType
+          in: query
+          description: type of customers id. 5 = passport id, 1 = id
+          required: true
+          type: string
+          minLength: 1
+          maxLength: 1
+          pattern: '^[135]*$'
+        - name: passportCountryCode
+          in: query
+          description: customers country code (1-4 digits)
+          required: true
+          type: string
+          pattern: '^\d+$'
+          maxLength: 4
+          minLength: 1
+        - name: selectedMonth
+          in: query
+          description: selected month for coins info
+          required: true
+          type: string
+          maxLength: 2
+        - name: selectedYear
+          in: query
+          description: selected year for coins info
+          required: true
+          type: string
+          maxLength: 4
+        - name: prevMonthNo
+          in: query
+          description: number of previous months to retrieve coin info
+          type: number
+      responses:
+        '200':
+          description: return customer token and gift coins
+          schema:
+            $ref: "#/definitions/coinsAccumulationResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /kochav/api/v1/registerCustomer:
+    x-swagger-pipe: register_customer_pipe
+    x-swagger-router-controller: kochav-gw
+    post:
+      operationId: registerCustomer
+      description: Register new Customer to loyalty
+      parameters:
+        - in: body
+          name: registerCustomer
+          description: Register new Customer to loyalty
+          schema:
+            $ref: "#/definitions/registerCustomer"
+      responses:
+        '200':
+          description: return customer token and gift coins
+          schema:
+            $ref: "#/definitions/registerCustomerResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /kochav/api/v1/pnId:
+    x-swagger-pipe: swagger_controllers_pipe
+    x-swagger-router-controller: kochav-gw
+    post:
+      operationId: pnId
+      description: update push notifiction ID
+      parameters:
+        - in: body
+          name: pnId
+          description: update push notifiction ID
+          schema:
+            $ref: "#/definitions/pnId"
+      responses:
+        '200':
+          description: return no data if success
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /kochav/api/v1/categoriesAndBrands:
+    x-swagger-pipe: swagger_controllers_pipe
+    x-swagger-router-controller: kochav-gw
+    put:
+      operationId: categoriesAndBrands
+      description: Update exist Customer
+      parameters:
+        - in: body
+          name: updateCustomer
+          description: Register new Customer
+          schema:
+            $ref: "#/definitions/categoriesAndBrands"
+      responses:
+        '200':
+          description: return no data
+
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    get:
+      operationId: getCategoriesAndBrands
+      description: Get exist Customer prefences
+      parameters:
+        - name: personalIdNumber
+          in: query
+          description: customers id or passport id (9 digits)
+          required: true
+          type: string
+          minLength: 9
+          maxLength: 9
+          pattern: '^\d+$'
+        - name: personalIdType
+          in: query
+          description: type of customers id. 5 = passport id, 1 = id
+          required: true
+          type: string
+          maxLength: 1
+          pattern: '^[135]*$'
+        - name: passportCountryCode
+          in: query
+          description: customer passport country code (4 digits)
+          required: false
+          type: string
+          pattern: '^\d+$'
+          maxLength: 4
+      responses:
+        '200':
+          description: return customer token and gift coins
+          schema:
+            $ref: "#/definitions/categoriesAndBrandsResponse"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /kochav/api/v1/customerIdentifier:
+    x-swagger-pipe: swagger_controllers_pipe
+    x-swagger-router-controller: kochav-gw
+    get:
+      description: get loyalty customer token
+      operationId: customerIdentifier
+      parameters:
+        - name: personalIdNumber
+          in: query
+          description: Customer ID number
+          required: true
+          type: string
+          minLength: 9
+          maxLength: 9
+          pattern: '^\d+$'
+        - name: personalIdType
+          in: query
+          description: Customer ID number type
+          required: true
+          type: string
+          maxLength: 1
+          pattern: '^[135]*$'
+        - name: passportCountryCode
+          in: query
+          description: Customer passport country code
+          required: true
+          type: string
+          pattern: '^\d+$'
+          maxLength: 4
+      responses:
+        '200':
+          description: return customer token and gift coins
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /kochav/api/v1/checkIfExist:
+    x-swagger-pipe: swagger_controllers_pipe
+    x-swagger-router-controller: kochav-gw
+    get:
+      description: check if a customer exists = registered to loyalty system
+      operationId: checkIfExist
+      parameters:
+        - name: personalIdNumber
+          in: query
+          description: customers id or passport id (9 digits)
+          required: true
+          type: string
+          minLength: 9
+          maxLength: 9
+          pattern: '^\d+$'
+        - name: personalIdType
+          in: query
+          description: type of customers id. 5 = passport id, 1 = id
+          required: true
+          type: string
+          minLength: 1
+          maxLength: 1
+          pattern: '^[135]*$'
+        - name: passportCountryCode
+          in: query
+          description: customers country code (1-4 digits)
+          required: true
+          type: string
+          pattern: '^\d+$'
+          maxLength: 4
+          minLength: 1
+      responses:
+        '200':
+          description: is customer registered to loylty
+          schema:
+            $ref: "#/definitions/isCustomerExist"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /kochav/api/v1/sso:
+    x-swagger-pipe: swagger_controllers_pipe
+    x-swagger-router-controller: kochav-gw
+    post:
+      operationId: ssoManager
+      description: SSO process with third party apps
+      parameters:
+        - in: body
+          name: SSOManager
+          description: SSO data
+          schema:
+            $ref: "#/definitions/SSOManager"
+      responses:
+        '200':
+          description: return url & sso token
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /version:
+    x-swagger-pipe: swagger_controllers_pipe
+    x-swagger-router-controller: monitoring
+    get:
+      operationId: version
+      description: get the microservice`s version
+      responses:
+        '200':
+          description: microservice`s version
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /ping:
+    x-swagger-pipe: swagger_controllers_pipe
+    x-swagger-router-controller: monitoring
+    get:
+      operationId: ping
+      description: ping the the microservice
+      responses:
+        '200':
+          description: is microservice`s up
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /vitality:
+    x-swagger-pipe: swagger_controllers_pipe
+    x-swagger-router-controller: monitoring
+    get:
+      operationId: vitality
+      description: check if the microservice is up n running
+      responses:
+        '200':
+          description: microservice`s properties
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /getenv:
+    x-swagger-pipe: swagger_controllers_pipe
+    x-swagger-router-controller: monitoring
+    get:
+      operationId: getenv
+      description: get microservice's environment variables
+      responses:
+        '200':
+          description: environment variables of the microservice
+          schema:
+            type: object
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /swagger:
+    x-swagger-pipe: swagger_raw
+# complex objects have schema definitions
+definitions:
+  ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  coinsAccumulationResponse:
+    type: object
+    properties:
+      digitalOperations:
+        type: array
+        items:
+          type: object
+          properties:
+            actionId:
+              type: string
+              maxLength: 4
+            actionName:
+              type: string
+              maxLength: 30
+            actionType:
+              type: string
+              maxLength: 2
+            actionDate:
+              type: string
+              format: date-time
+            actionCoinsNo:
+              type: number
+            actionCoinsReason:
+              type: string
+              maxLength: 30
+            creditTargetMonth:
+              type: string
+              maxLength: 2
+              minLength: 2
+            creditTargetYear:
+              type: string
+              maxLength: 4
+              minLength: 4
+      loyEvents:
+        type: array
+        items:
+          type: object
+          properties:
+            actionId:
+              type: string
+              maxLength: 4
+            actionName:
+              type: string
+              maxLength: 30
+            actionType:
+              type: string
+              maxLength: 2
+            actionDate:
+              type: string
+              format: date-time
+            actionCoinsNo:
+              type: number
+            actionCoinsReason:
+              type: string
+              maxLength: 30
+            creditTargetMonth:
+              type: string
+              maxLength: 2
+              minLength: 2
+            creditTargetYear:
+              type: string
+              maxLength: 4
+              minLength: 4
+      creditCardCharges:
+        type: array
+        items:
+          type: object
+          properties:
+            mezaheCard:
+              type: string
+              maxLength: 30
+            currentMonthlyBalance:
+              type: number
+            maskedNumber:
+              type: string
+              maxLength: 4
+            creditTargetMonth:
+              type: string
+              maxLength: 2
+              minLength: 2
+            creditTargetYear:
+              type: string
+              maxLength: 4
+              minLength: 4
+      monthlyAccumulations:
+        type: array
+        items:
+          type: object
+          properties:
+            creditCardCoinsNo:
+              type: number
+            creditCardCoinsStatus:
+              type: string
+              maxLength: 1
+            totalCreditCardCharges:
+              type: number
+            startCycle:
+              type: string
+              maxLength: 8
+            endCycle:
+              type: string
+              maxLength: 8
+            digitalOperationsTotalCoins:
+              type: number
+            loyEventsTotalCoins:
+              type: number
+            totalCoins:
+              type: number
+            creditTargetMonth:
+              type: string
+              maxLength: 2
+            creditTargetYear:
+              type: string
+              maxLength: 4
+      registerDate:
+        type: string
+      registerFlag:
+        type: boolean
+    required:
+      - digitalOperations
+      - loyEvents
+      - creditCardCharges
+      - monthlyAccumulations
+  isCustomerExist:
+    type: object
+    properties:
+      loyCustomerIdentifier:
+        type: string
+        maxLength: 36
+      wasRegisteredFlag:
+        type: boolean
+      interestsAndBrandsFlag:
+        type: string
+    required:
+      - wasRegisteredFlag
+  registerCustomer:
+    type: object
+    properties:
+      LOYUniqueId:
+        type: string
+        maxLength: 36
+        minLength: 36
+      personalIdNumber:
+        type: string
+        minLength: 9
+        maxLength: 9
+        pattern: '^\d+$'
+      personalIdType:
+        type: string
+        maxLength: 1
+        pattern: '^[135]*$'
+      passportCountryCode:
+        type: string
+        maxLength: 4
+        pattern: '^\d+$'
+      nameOfUserFirst:
+        type: string
+        maxLength: 14
+      nameOfUserFamily:
+        type: string
+        maxLength: 24
+      birthDate:
+        type: string
+        format: date-time
+      gender:
+        type: string
+        maxLength: 10
+      airLineClubIndication:
+        description: string of 1 digits (0 = none, 1 = Frequent flyer, 2 = Fly card)
+        type: string
+        maxLength: 1
+        pattern: '^\d+$'
+      airLineClubNumber:
+        description: string of 10 digits (Frequent flyer number)
+        type: string
+        maxLength: 10
+        pattern: '^\d+$'
+      preferences:
+        type: object
+        properties:
+          categories:
+            type: array
+            items:
+              type: object
+              properties:
+                categoryID:
+                  type: number
+                categoryName:
+                  type: string
+          brands:
+            type: array
+            items:
+              type: object
+              properties:
+                brandID:
+                  type: integer
+                brandName:
+                  type: string
+    required:
+      - LOYUniqueId
+      - personalIdNumber
+      - personalIdType
+      - nameOfUserFirst
+      - nameOfUserFamily
+      - birthDate
+  pnId:
+    type: object
+    properties:
+      personalIdNumber:
+        type: string
+        minLength: 9
+        maxLength: 9
+        pattern: '^\d+$'
+      personalIdType:
+        type: string
+        maxLength: 1
+        pattern: '^[135]*$'
+      passportCountryCode:
+        type: string
+        maxLength: 4
+        pattern: '^\d+$'
+      pnId:
+        type: string
+        maxLength: 512
+      store:
+        type: string
+        maxLength: 4
+        pattern: '^\d+$'
+      channel:
+        type: integer
+        format: int32
+    required:
+      - personalIdNumber
+      - personalIdType
+      - passportCountryCode
+      - pnId
+      - store
+      - channel
+  registerCustomerResponse:
+    type: object
+    properties:
+      loyCustomerIdentifier:
+        type: string
+        maxLength: 36
+      GiftCoins:
+        type: integer
+    required:
+      - loyCustomerIdentifier
+      - GiftCoins
+  categoriesAndBrands:
+    type: object
+    properties:
+      personalIdNumber:
+        type: string
+        minLength: 9
+        maxLength: 9
+        pattern: '^\d+$'
+      personalIdType:
+        type: string
+        maxLength: 1
+        pattern: '^[135]*$'
+      passportCountryCode:
+        type: string
+        maxLength: 4
+        pattern: '^\d+$'
+      preferences:
+        type: object
+        properties:
+          categories:
+            type: array
+            items:
+              type: object
+              properties:
+                categoryID:
+                  type: number
+                categoryName:
+                  type: string
+          brands:
+            type: array
+            items:
+              type: object
+              properties:
+                brandID:
+                  type: number
+                brandName:
+                  type: string
+    required:
+      - personalIdNumber
+      - personalIdType
+      - preferences
+  SSOManager:
+    type: object
+    properties:
+      trxId:
+        type: string
+        maxLength: 36
+      appId:
+        type: string
+        maxLength: 9
+      externalProvider:
+        type: string
+        maxLength: 10
+      operation:
+        type: number
+      metaData:
+        type: object
+    required:
+      - trxId
+      - appId
+      - externalProvider
+      - operation
+      - metaData
+  categoriesAndBrandsResponse:
+    type: object
+    properties:
+      categories:
+        type: array
+        items:
+          type: object
+          properties:
+            categoryID:
+              type: number
+            categoryName:
+              type: string
+      brands:
+        items:
+          type: object
+          properties:
+            brandID:
+              type: number
+            brandName:
+              type: string
+
+
+
